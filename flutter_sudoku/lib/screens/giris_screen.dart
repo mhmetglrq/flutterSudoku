@@ -20,54 +20,65 @@ class _GirisState extends State<Giris> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          dil['giris_title'],
-        ),
-        actions: [
-          IconButton(
-              onPressed: () {
-                var box = Hive.box('ayarlar');
-                box.put('karanlik_tema',
-                    !box.get('karanlik_tema', defaultValue: false));
-              },
-              icon: const Icon(Icons.theater_comedy_sharp)),
-          PopupMenuButton(
-            icon: const Icon(Icons.add_box),
-            onSelected: (val) {
-              if (_sudokuKutu.isOpen) {
-                _sudokuKutu.put('seviye', val);
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const Sudoku()));
-              }
-            },
-            itemBuilder: (context) => <PopupMenuEntry>[
-              PopupMenuItem(
-                value: dil['seviye_secin'],
-                enabled: false,
-                child: Text(
-                  dil['seviye_secin'],
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).textTheme.bodyText1!.color,
-                  ),
-                ),
+    return FutureBuilder<Box>(
+      future: _openBox(),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.hasData) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                dil['giris_title'],
               ),
-              for (String k in sudokuSeviyeleri.keys)
-                PopupMenuItem(
-                  value: k,
-                  child: Text(k),
+              actions: [
+                IconButton(
+                    onPressed: () {
+                      var box = Hive.box('ayarlar');
+                      box.put('karanlik_tema',
+                          !box.get('karanlik_tema', defaultValue: false));
+                    },
+                    icon: const Icon(Icons.theater_comedy_sharp)),
+                if (_sudokuKutu.get('sudokuRows') != null)
+                  IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Sudoku()));
+                      },
+                      icon: const Icon(Icons.play_circle_fill_rounded)),
+                PopupMenuButton(
+                  icon: const Icon(Icons.add_box),
+                  onSelected: (val) {
+                    if (_sudokuKutu.isOpen) {
+                      _sudokuKutu.put('seviye', val);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Sudoku()));
+                    }
+                  },
+                  itemBuilder: (context) => <PopupMenuEntry>[
+                    PopupMenuItem(
+                      value: dil['seviye_secin'],
+                      enabled: false,
+                      child: Text(
+                        dil['seviye_secin'],
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).textTheme.bodyText1!.color,
+                        ),
+                      ),
+                    ),
+                    for (String k in sudokuSeviyeleri.keys)
+                      PopupMenuItem(
+                        value: k,
+                        child: Text(k),
+                      )
+                  ],
                 )
-            ],
-          )
-        ],
-      ),
-      body: FutureBuilder<Box>(
-        future: _openBox(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.hasData) {
-            return Center(
+              ],
+            ),
+            body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -79,14 +90,11 @@ class _GirisState extends State<Giris> {
                     Center(child: Text('$eleman'))
                 ],
               ),
-            );
-          }
-
-          return const Center(
-            child: CircularProgressIndicator(),
+            ),
           );
-        },
-      ),
+        }
+        return const CircularProgressIndicator();
+      },
     );
   }
 }
