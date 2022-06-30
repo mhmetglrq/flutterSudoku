@@ -1,60 +1,63 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_sudoku/screens/dil.dart';
 import 'package:flutter_sudoku/screens/sudoku_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
+import 'dil.dart';
 
 class Giris extends StatefulWidget {
-  const Giris({Key? key}) : super(key: key);
-
   @override
-  State<Giris> createState() => _GirisState();
+  _GirisState createState() => _GirisState();
 }
 
 class _GirisState extends State<Giris> {
   late Box _sudokuKutu;
-  Future<Box> _openBox() async {
-    _sudokuKutu = await Hive.openBox("sudoku");
+  Future<Box> _kutuAc() async {
+    _sudokuKutu = await Hive.openBox('sudoku');
     return await Hive.openBox('finished_sudokus');
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Box>(
-      future: _openBox(),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
+      future: _kutuAc(),
+      builder: (context, snapshot) {
         if (snapshot.hasData) {
           return Scaffold(
             appBar: AppBar(
-              title: Text(
-                dil['giris_title'],
-              ),
-              actions: [
+              title: Text(dil['giris_title']),
+              actions: <Widget>[
                 IconButton(
-                    onPressed: () {
-                      var box = Hive.box('ayarlar');
-                      box.put('karanlik_tema',
-                          !box.get('karanlik_tema', defaultValue: false));
-                    },
-                    icon: const Icon(Icons.theater_comedy_sharp)),
+                  icon: const Icon(Icons.settings),
+                  onPressed: () {
+                    Box kutu = Hive.box('ayarlar');
+                    kutu.put(
+                      'karanlik_tema',
+                      !kutu.get('karanlik_tema', defaultValue: false),
+                    );
+                  },
+                ),
                 if (_sudokuKutu.get('sudokuRows') != null)
                   IconButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Sudoku()));
-                      },
-                      icon: const Icon(Icons.play_circle_fill_rounded)),
-                PopupMenuButton(
-                  icon: const Icon(Icons.add_box),
-                  onSelected: (val) {
-                    if (_sudokuKutu.isOpen) {
-                      _sudokuKutu.put('seviye', val);
+                    icon: const Icon(Icons.play_circle_outline),
+                    onPressed: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const Sudoku()));
+                        context,
+                        MaterialPageRoute(builder: (_) => const Sudoku()),
+                      );
+                    },
+                  ),
+                PopupMenuButton(
+                  icon: const Icon(Icons.add),
+                  onSelected: (deger) {
+                    if (_sudokuKutu.isOpen) {
+                      _sudokuKutu.put('seviye', deger);
+                      _sudokuKutu.put('sudokuRows', null);
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const Sudoku()),
+                      );
                     }
                   },
                   itemBuilder: (context) => <PopupMenuEntry>[
@@ -65,7 +68,7 @@ class _GirisState extends State<Giris> {
                         dil['seviye_secin'],
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(context).textTheme.bodyText1!.color,
+                          color: Theme.of(context).textTheme.bodyText1?.color,
                         ),
                       ),
                     ),
@@ -73,27 +76,42 @@ class _GirisState extends State<Giris> {
                       PopupMenuItem(
                         value: k,
                         child: Text(k),
-                      )
+                      ),
                   ],
-                )
+                ),
               ],
             ),
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  if (snapshot.data.length == 0)
-                    Text(dil['tamamlanan_yok'],
-                        style: GoogleFonts.cairo(
-                            textStyle: const TextStyle(fontSize: 18))),
-                  for (var eleman in snapshot.data.values)
-                    Center(child: Text('$eleman'))
-                ],
-              ),
+            body: ValueListenableBuilder<Box>(
+              valueListenable: snapshot.data!.listenable(),
+              builder: (context, box, _) {
+                return Column(
+                  children: <Widget>[
+                    if (box.length == 0)
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          dil['tamanlanan_yok'],
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.lobster(
+                            textStyle: const TextStyle(fontSize: 24.0),
+                          ),
+                        ),
+                      ),
+                    for (Map eleman in box.values.toList().reversed.take(30))
+                      ListTile(
+                        onTap: () {},
+                        title: Text("${eleman['tarih']}"),
+                        subtitle: Text("${Duration(seconds: eleman['sure'])}"
+                            .split('.')
+                            .first),
+                      )
+                  ],
+                );
+              },
             ),
           );
         }
-        return const CircularProgressIndicator();
+        return const Center(child: CircularProgressIndicator());
       },
     );
   }

@@ -5,7 +5,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_sudoku/screens/dil.dart';
 import 'package:flutter_sudoku/sudokular.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:wakelock/wakelock.dart';
 
 final Map<String, int> sudokuSeviyeleri = {
   dil['seviye1']: 62,
@@ -31,7 +33,7 @@ class _SudokuState extends State<Sudoku> {
   late String _sudokuString;
 
   bool _note = false;
-
+  bool _finished = false;
   void _sudokuOlustur() {
     int? gorulecekSayisi = sudokuSeviyeleri[
         _sudokuKutu.get('seviye', defaultValue: dil['seviye2'])];
@@ -60,7 +62,7 @@ class _SudokuState extends State<Sudoku> {
 
     _sudokuKutu.put('sudokuRows', _sudoku);
     _sudokuKutu.put('xy', "99");
-    _sudokuKutu.put('ipucu', 3);
+    _sudokuKutu.put('ipucu', 39);
     _sudokuKutu.put('sure', 0);
 
     print(gorulecekSayisi);
@@ -68,20 +70,58 @@ class _SudokuState extends State<Sudoku> {
   }
 
   void _adimKaydet() {
-    Map historyItem = {
-      'sudokuRows': _sudokuKutu.get('sudokuRows'),
-      'xy': _sudokuKutu.get('xy'),
-      'ipucu': _sudokuKutu.get('ipucu')
-    };
-    _sudokuHistory.add(jsonEncode(historyItem));
-    _sudokuKutu.put('sudokuHistory', _sudokuHistory);
+    String sudoSonDurum = _sudokuKutu.get('sudokuRows').toString();
+    if (sudoSonDurum.contains("0")) {
+      Map historyItem = {
+        'sudokuRows': _sudokuKutu.get('sudokuRows'),
+        'xy': _sudokuKutu.get('xy'),
+        'ipucu': _sudokuKutu.get('ipucu')
+      };
+      _sudokuHistory.add(jsonEncode(historyItem));
+      _sudokuKutu.put('sudokuHistory', _sudokuHistory);
+    } else {
+      _sudokuString = _sudokuKutu.get('_sudokuString');
+      String kontrol = sudoSonDurum.replaceAll(RegExp(r'[e, \][]'), '');
+      print(_sudokuString);
+      if (kontrol == _sudokuString) {
+        Fluttertoast.showToast(
+          msg: 'Tebrikler sudokuyu başarıyla bitirdiniz',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+        );
+        Box tamamlananKutusu = Hive.box('finished_sudokus');
+        Map tamamlananSudoku = {
+          'tarih': DateTime.now(),
+          'cozulmus': _sudokuKutu.get('sudokuRows'),
+          'sure': _sudokuKutu.get('sure'),
+          'sudokuHistory': _sudokuKutu.get('sudokuHistory')
+        };
+        tamamlananKutusu.add(tamamlananSudoku);
+        _sudokuKutu.put('sudokuRows', null);
+        _finished = true;
+        Navigator.pop(context);
+      } else {
+        Fluttertoast.showToast(
+          msg: 'Sudokunuz hatalı',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+        );
+      }
+
+      print(kontrol);
+    }
   }
 
   @override
   void initState() {
     super.initState();
+    Wakelock.enable();
     if (_sudokuKutu.get('sudokuRows') == null) {
       _sudokuOlustur();
+    } else {
+      _sudoku = _sudokuKutu.get('sudokuRows');
     }
 
     _sayac = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -96,7 +136,7 @@ class _SudokuState extends State<Sudoku> {
     if (_sayac != null && _sayac.isActive) {
       _sayac.cancel();
     }
-
+    Wakelock.disable();
     super.dispose();
   }
 
@@ -136,7 +176,8 @@ class _SudokuState extends State<Sudoku> {
                     );
                     int xC = int.parse(xy.substring(0, 1)),
                         yC = int.parse(xy.substring(1));
-                    List sudokuRows = box.get('sudokuRows');
+                    List? sudokuRows = box.get('sudokuRows');
+                    var replaceRows = sudokuRows;
                     return Container(
                       padding: const EdgeInsets.all(2),
                       margin: const EdgeInsets.all(8),
@@ -167,10 +208,10 @@ class _SudokuState extends State<Sudoku> {
                                                                   : 1.0),
                                                   alignment: Alignment.center,
                                                   child:
-                                                      "${sudokuRows[x][y]}"
+                                                      "${replaceRows![x][y]}"
                                                               .startsWith("e")
                                                           ? Text(
-                                                              sudokuRows[x][y]
+                                                              replaceRows[x][y]
                                                                   .toString()
                                                                   .substring(1),
                                                               style: const TextStyle(
@@ -186,7 +227,7 @@ class _SudokuState extends State<Sudoku> {
                                                                     "$x$y");
                                                               },
                                                               child: Center(
-                                                                child: "${sudokuRows[x][y]}"
+                                                                child: "${replaceRows[x][y]}"
                                                                             .length >
                                                                         8
                                                                     ? Column(
@@ -202,7 +243,7 @@ class _SudokuState extends State<Sudoku> {
                                                                                       Expanded(
                                                                                         child: Center(
                                                                                           child: Text(
-                                                                                            "${sudokuRows[x][y]}".split('')[i + j] == "0" ? "" : "${sudokuRows[x][y]}".split('')[i + j],
+                                                                                            "${replaceRows[x][y]}".split('')[i + j] == "0" ? "" : "${replaceRows[x][y]}".split('')[i + j],
                                                                                             style: const TextStyle(fontSize: 10),
                                                                                           ),
                                                                                         ),
@@ -214,9 +255,9 @@ class _SudokuState extends State<Sudoku> {
                                                                         ],
                                                                       )
                                                                     : Text(
-                                                                        sudokuRows[x][y] !=
+                                                                        replaceRows[x][y] !=
                                                                                 "0"
-                                                                            ? sudokuRows[x][y].toString()
+                                                                            ? replaceRows[x][y].toString()
                                                                             : "",
                                                                         style: const TextStyle(
                                                                             fontSize:

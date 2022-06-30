@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
             theme: box.get('karanlik_tema', defaultValue: false)
                 ? ThemeData.dark()
                 : ThemeData.light(),
-            home: const Giris(),
+            home: Giris(),
           );
         });
   }
