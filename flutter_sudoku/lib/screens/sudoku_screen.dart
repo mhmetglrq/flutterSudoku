@@ -4,6 +4,8 @@ import 'dart:math';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:flutter/material.dart';
 import 'package:flutter_sudoku/screens/dil.dart';
+import 'package:flutter_sudoku/screens/giris_screen.dart';
+import 'package:flutter_sudoku/screens/sonuc_screen.dart';
 import 'package:flutter_sudoku/sudokular.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -95,12 +97,21 @@ class _SudokuState extends State<Sudoku> {
           'tarih': DateTime.now(),
           'cozulmus': _sudokuKutu.get('sudokuRows'),
           'sure': _sudokuKutu.get('sure'),
+          'seviye': _sudokuKutu.get('seviye', defaultValue: dil['seviye2']),
           'sudokuHistory': _sudokuKutu.get('sudokuHistory')
         };
+        String _seviye = _sudokuKutu.get('seviye', defaultValue: dil['seviye2']);
+        _sudokuKutu.put('currentLevel', _seviye);
         tamamlananKutusu.add(tamamlananSudoku);
         _sudokuKutu.put('sudokuRows', null);
         _finished = true;
-        Navigator.pop(context);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => Sonuc(
+                map: tamamlananSudoku,
+              ),
+            ));
       } else {
         Fluttertoast.showToast(
           msg: 'Sudokunuz hatalı',
@@ -151,7 +162,10 @@ class _SudokuState extends State<Sudoku> {
         actions: [
           Expanded(
             child: IconButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (_) => const Giris()));
+              },
               color: const Color(0xFFF1AA9B),
               icon: const Icon(Icons.arrow_back_ios_outlined),
             ),
@@ -401,7 +415,7 @@ class _SudokuState extends State<Sudoku> {
                       alignment: Alignment.center,
                       margin: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(5),
                         border: Border.all(
                           width: 1,
                           color: const Color(0xFFF1AA9B),
@@ -427,7 +441,7 @@ class _SudokuState extends State<Sudoku> {
                                   Duration(seconds: box.get('sure')).toString();
                               return Container(
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
+                                  borderRadius: BorderRadius.circular(5),
                                   border: Border.all(
                                     width: 1,
                                     color: const Color(0xFFF1AA9B),

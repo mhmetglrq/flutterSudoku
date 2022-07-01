@@ -1,18 +1,190 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_sudoku/screens/dil.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
+import 'giris_screen.dart';
+import 'sudoku_screen.dart';
 
 class Sonuc extends StatefulWidget {
-  const Sonuc({Key? key}) : super(key: key);
+  final Map map;
+
+  const Sonuc({
+    Key? key,
+    required this.map,
+  }) : super(key: key);
 
   @override
   State<Sonuc> createState() => _SonucState();
 }
 
 class _SonucState extends State<Sonuc> {
+  final Box _sudokuKutu = Hive.box('sudoku');
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(dil['sonuc_title'])),
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        color: const Color(0xFF0F110C),
+        alignment: Alignment.center,
+        child: Column(
+          children: [
+            Expanded(
+              child: Center(
+                child: Text(
+                  "Tebrikler Sudokuyu Bitirdin!",
+                  style: GoogleFonts.getFont(
+                    'Permanent Marker',
+                    textStyle: const TextStyle(
+                      fontSize: 25,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (_) => const Giris()));
+                      },
+                      child: AspectRatio(
+                        aspectRatio: 1,
+                        child: Container(
+                          alignment: Alignment.center,
+                          margin: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              width: 2,
+                              color: const Color(0xFF312C51),
+                            ),
+                          ),
+                          child: Text(
+                            "Ana Menüye Dön",
+                            style: GoogleFonts.getFont(
+                              'Permanent Marker',
+                              textStyle: const TextStyle(
+                                fontSize: 25,
+                              ),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  ValueListenableBuilder<Box>(
+                      valueListenable:
+                          _sudokuKutu.listenable(keys: ['currentLevel']),
+                      builder: (context, box, snapshot) {
+                        return Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              print(box.get('currentLevel'));
+                              String currentLevel = box.get('currentLevel');
+                              if (currentLevel == "Çok Kolay") {
+                                _sudokuKutu.put('seviye', "Kolay");
+                                _sudokuKutu.put('sudokuRows', null);
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const Sudoku()),
+                                );
+                              } else if (currentLevel == "Kolay") {
+                                _sudokuKutu.put('seviye', "Orta");
+                                _sudokuKutu.put('sudokuRows', null);
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const Sudoku()),
+                                );
+                              } else if (currentLevel == "Orta") {
+                                _sudokuKutu.put('seviye', "Zor");
+                                _sudokuKutu.put('sudokuRows', null);
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const Sudoku()),
+                                );
+                              } else if (currentLevel == "Zor") {
+                                _sudokuKutu.put('seviye', "Çok Zor");
+                                _sudokuKutu.put('sudokuRows', null);
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const Sudoku()),
+                                );
+                              } else if (currentLevel == "Çok Zor") {
+                                _sudokuKutu.put('seviye', "İmkansız");
+                                _sudokuKutu.put('sudokuRows', null);
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const Sudoku()),
+                                );
+                              }
+                            },
+                            child: AspectRatio(
+                              aspectRatio: 1,
+                              child: Container(
+                                alignment: Alignment.center,
+                                margin: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    width: 2,
+                                    color: const Color(0xFFF1AA9B),
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "Bir Üst Seviyeye Geç",
+                                        style: GoogleFonts.getFont(
+                                          'Permanent Marker',
+                                          textStyle: const TextStyle(
+                                            fontSize: 25,
+                                          ),
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                    // Expanded(
+                                    //   child: Text(
+                                    //     "",
+                                    //     style: GoogleFonts.getFont(
+                                    //       'Permanent Marker',
+                                    //       textStyle: const TextStyle(
+                                    //         fontSize: 25,
+                                    //       ),
+                                    //     ),
+                                    //     textAlign: TextAlign.center,
+                                    //   ),
+                                    // ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
