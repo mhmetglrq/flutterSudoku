@@ -81,33 +81,39 @@ class _GirisState extends State<Giris> {
                 ),
               ],
             ),
-            body: ValueListenableBuilder<Box>(
-              valueListenable: snapshot.data!.listenable(),
-              builder: (context, box, _) {
-                return Column(
-                  children: <Widget>[
-                    if (box.length == 0)
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          dil['tamanlanan_yok'],
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.lobster(
-                            textStyle: const TextStyle(fontSize: 24.0),
+            body: SingleChildScrollView(
+              child: Container(
+                child: ValueListenableBuilder<Box>(
+                  valueListenable: snapshot.data!.listenable(),
+                  builder: (context, box, _) {
+                    return Column(
+                      children: <Widget>[
+                        if (box.length == 0)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              dil['tamanlanan_yok'],
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.lobster(
+                                textStyle: const TextStyle(fontSize: 24.0),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    for (Map eleman in box.values.toList().reversed.take(30))
-                      ListTile(
-                        onTap: () {},
-                        title: Text("${eleman['tarih']}"),
-                        subtitle: Text("${Duration(seconds: eleman['sure'])}"
-                            .split('.')
-                            .first),
-                      )
-                  ],
-                );
-              },
+                        for (Map eleman
+                            in box.values.toList().reversed.take(30))
+                          ListTile(
+                            onTap: () {},
+                            title: Text("${eleman['tarih']}"),
+                            subtitle: Text(
+                                "${Duration(seconds: eleman['sure'])}"
+                                    .split('.')
+                                    .first),
+                          )
+                      ],
+                    );
+                  },
+                ),
+              ),
             ),
           );
         }
