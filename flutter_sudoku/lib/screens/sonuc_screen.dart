@@ -19,7 +19,7 @@ class Sonuc extends StatefulWidget {
 
 class _SonucState extends State<Sonuc> {
   final Box _sudokuKutu = Hive.box('sudoku');
-
+  String? nextLevelName;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,8 +49,13 @@ class _SonucState extends State<Sonuc> {
                   Expanded(
                     child: InkWell(
                       onTap: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (_) => const Giris()));
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (BuildContext context) => const Giris(),
+                          ),
+                          (route) => false,
+                        );
                       },
                       child: AspectRatio(
                         aspectRatio: 1,
@@ -90,47 +95,62 @@ class _SonucState extends State<Sonuc> {
                               if (currentLevel == "Çok Kolay") {
                                 _sudokuKutu.put('seviye', "Kolay");
                                 _sudokuKutu.put('sudokuRows', null);
-
-                                Navigator.push(
+                                nextLevelName = 'Kolay';
+                                Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (_) => const Sudoku()),
+                                    builder: (BuildContext context) =>
+                                        const Sudoku(),
+                                  ),
+                                  (route) => false,
                                 );
                               } else if (currentLevel == "Kolay") {
                                 _sudokuKutu.put('seviye', "Orta");
                                 _sudokuKutu.put('sudokuRows', null);
 
-                                Navigator.push(
+                                Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (_) => const Sudoku()),
+                                    builder: (BuildContext context) =>
+                                        const Sudoku(),
+                                  ),
+                                  (route) => false,
                                 );
                               } else if (currentLevel == "Orta") {
                                 _sudokuKutu.put('seviye', "Zor");
                                 _sudokuKutu.put('sudokuRows', null);
 
-                                Navigator.push(
+                                Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (_) => const Sudoku()),
+                                    builder: (BuildContext context) =>
+                                        const Sudoku(),
+                                  ),
+                                  (route) => false,
                                 );
                               } else if (currentLevel == "Zor") {
                                 _sudokuKutu.put('seviye', "Çok Zor");
                                 _sudokuKutu.put('sudokuRows', null);
 
-                                Navigator.push(
+                                Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (_) => const Sudoku()),
+                                    builder: (BuildContext context) =>
+                                        const Sudoku(),
+                                  ),
+                                  (route) => false,
                                 );
                               } else if (currentLevel == "Çok Zor") {
                                 _sudokuKutu.put('seviye', "İmkansız");
                                 _sudokuKutu.put('sudokuRows', null);
 
-                                Navigator.push(
+                                Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (_) => const Sudoku()),
+                                    builder: (BuildContext context) =>
+                                        const Sudoku(),
+                                  ),
+                                  (route) => false,
                                 );
                               }
                             },

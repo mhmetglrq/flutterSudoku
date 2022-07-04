@@ -32,9 +32,22 @@ class _GirisState extends State<Giris> {
               elevation: 0,
               actions: <Widget>[
                 Expanded(
-                  child: IconButton(
-                    icon: const Icon(Icons.settings),
-                    onPressed: () {},
+                  child: Center(
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: Container(
+                        margin: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          // image: const DecorationImage(
+                          //   image: AssetImage(
+                          //     'assets/logo.png',
+                          //   ),
+                          //   fit: BoxFit.fill,
+                          // ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
                 Expanded(

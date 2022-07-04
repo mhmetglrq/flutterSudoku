@@ -86,12 +86,12 @@ class _SudokuState extends State<Sudoku> {
       String kontrol = sudoSonDurum.replaceAll(RegExp(r'[e, \][]'), '');
       print(_sudokuString);
       if (kontrol == _sudokuString) {
-        Fluttertoast.showToast(
-          msg: 'Tebrikler sudokuyu başarıyla bitirdiniz',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-        );
+        // Fluttertoast.showToast(
+        //   msg: 'Tebrikler sudokuyu başarıyla bitirdiniz',
+        //   toastLength: Toast.LENGTH_SHORT,
+        //   gravity: ToastGravity.CENTER,
+        //   timeInSecForIosWeb: 1,
+        // );
         Box tamamlananKutusu = Hive.box('finished_sudokus');
         Map tamamlananSudoku = {
           'tarih': DateTime.now(),
@@ -100,18 +100,19 @@ class _SudokuState extends State<Sudoku> {
           'seviye': _sudokuKutu.get('seviye', defaultValue: dil['seviye2']),
           'sudokuHistory': _sudokuKutu.get('sudokuHistory')
         };
-        String _seviye = _sudokuKutu.get('seviye', defaultValue: dil['seviye2']);
-        _sudokuKutu.put('currentLevel', _seviye);
+        String seviye = _sudokuKutu.get('seviye', defaultValue: dil['seviye2']);
+        _sudokuKutu.put('currentLevel', seviye);
         tamamlananKutusu.add(tamamlananSudoku);
-        _sudokuKutu.put('sudokuRows', null);
+
         _finished = true;
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => Sonuc(
-                map: tamamlananSudoku,
-              ),
-            ));
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => Sonuc(map: tamamlananSudoku),
+          ),
+          (route) => false,
+        );
+        _sudokuKutu.put('sudokuRows', null);
       } else {
         Fluttertoast.showToast(
           msg: 'Sudokunuz hatalı',
@@ -257,153 +258,152 @@ class _SudokuState extends State<Sudoku> {
               AspectRatio(
                 aspectRatio: 1,
                 child: ValueListenableBuilder<Box>(
-                    valueListenable:
-                        _sudokuKutu.listenable(keys: ['xy', 'sudokuRows']),
-                    builder: (context, box, widget) {
-                      String xy = box.get(
-                        'xy',
-                      );
-                      int xC = int.parse(xy.substring(0, 1)),
-                          yC = int.parse(xy.substring(1));
-                      List? sudokuRows = box.get('sudokuRows');
-                      var replaceRows = sudokuRows;
-                      return Container(
-                        padding: const EdgeInsets.all(3),
-                        margin: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF0F110C),
-                          borderRadius: BorderRadius.circular(15),
-                          // border: Border.all(
-                          //   width: 1,
-                          //   color: const Color(0xFFCCFCCB),
-                          // ),
-                        ),
-                        child: Column(
-                          children: <Widget>[
-                            for (int x = 0; x < 9; x++)
-                              Expanded(
-                                child: Column(
-                                  children: [
-                                    Expanded(
-                                      child: Row(
-                                        children: [
-                                          for (int y = 0; y < 9; y++)
-                                            Expanded(
-                                                child: Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8),
-                                                      color: xC == x && yC == y
-                                                          ? const Color(
-                                                              0xFF541690)
-                                                          : xC == x || yC == y
-                                                              ? const Color(
-                                                                  0xFF48426D)
-                                                              : const Color(
-                                                                  0xFF312C51),
-                                                    ),
-                                                    margin:
-                                                        const EdgeInsets.all(
-                                                            1.2),
-                                                    alignment: Alignment.center,
-                                                    child:
-                                                        "${replaceRows![x][y]}"
-                                                                .startsWith("e")
-                                                            ? Text(
-                                                                replaceRows[x]
-                                                                        [y]
-                                                                    .toString()
-                                                                    .substring(
-                                                                        1),
-                                                                style:
-                                                                    const TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  fontSize: 20,
-                                                                  color: Color(
-                                                                      0xFFF1AA9B),
-                                                                ),
-                                                              )
-                                                            : InkWell(
-                                                                onTap: () {
-                                                                  _sudokuKutu.put(
-                                                                      'xy',
-                                                                      "$x$y");
-                                                                },
-                                                                child: Center(
-                                                                  child: "${replaceRows[x][y]}"
-                                                                              .length >
-                                                                          8
-                                                                      ? Column(
-                                                                          children: [
-                                                                            for (int i = 0;
-                                                                                i < 9;
-                                                                                i += 3)
-                                                                              Expanded(
-                                                                                child: Center(
-                                                                                  child: Row(
-                                                                                    children: [
-                                                                                      for (int j = 0; j < 3; j++)
-                                                                                        Expanded(
-                                                                                          child: Center(
-                                                                                            child: Text(
-                                                                                              "${replaceRows[x][y]}".split('')[i + j] == "0" ? "" : "${replaceRows[x][y]}".split('')[i + j],
-                                                                                              style: const TextStyle(
-                                                                                                fontSize: 10,
-                                                                                                color: Color(0xFFF1AA9B),
-                                                                                              ),
+                  valueListenable:
+                      _sudokuKutu.listenable(keys: ['xy', 'sudokuRows']),
+                  builder: (context, box, widget) {
+                    String xy = box.get(
+                      'xy',
+                    );
+                    int xC = int.parse(xy.substring(0, 1)),
+                        yC = int.parse(xy.substring(1));
+                    List? sudokuRows = box.get('sudokuRows');
+                    var replaceRows = sudokuRows;
+                    return Container(
+                      padding: const EdgeInsets.all(3),
+                      margin: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0F110C),
+                        borderRadius: BorderRadius.circular(15),
+                        // border: Border.all(
+                        //   width: 1,
+                        //   color: const Color(0xFFCCFCCB),
+                        // ),
+                      ),
+                      child: Column(
+                        children: <Widget>[
+                          for (int x = 0; x < 9; x++)
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                    child: Row(
+                                      children: [
+                                        for (int y = 0; y < 9; y++)
+                                          Expanded(
+                                              child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                    color: xC == x && yC == y
+                                                        ? const Color(
+                                                            0xFF541690)
+                                                        : xC == x || yC == y
+                                                            ? const Color(
+                                                                0xFF48426D)
+                                                            : const Color(
+                                                                0xFF312C51),
+                                                  ),
+                                                  margin:
+                                                      const EdgeInsets.all(1.2),
+                                                  alignment: Alignment.center,
+                                                  child:
+                                                      "${replaceRows![x][y]}"
+                                                              .startsWith("e")
+                                                          ? Text(
+                                                              replaceRows[x][y]
+                                                                  .toString()
+                                                                  .substring(1),
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                fontSize: 20,
+                                                                color: Color(
+                                                                    0xFFF1AA9B),
+                                                              ),
+                                                            )
+                                                          : InkWell(
+                                                              onTap: () {
+                                                                _sudokuKutu.put(
+                                                                    'xy',
+                                                                    "$x$y");
+                                                              },
+                                                              child: Center(
+                                                                child: "${replaceRows[x][y]}"
+                                                                            .length >
+                                                                        8
+                                                                    ? Column(
+                                                                        children: [
+                                                                          for (int i = 0;
+                                                                              i < 9;
+                                                                              i += 3)
+                                                                            Expanded(
+                                                                              child: Center(
+                                                                                child: Row(
+                                                                                  children: [
+                                                                                    for (int j = 0; j < 3; j++)
+                                                                                      Expanded(
+                                                                                        child: Center(
+                                                                                          child: Text(
+                                                                                            "${replaceRows[x][y]}".split('')[i + j] == "0" ? "" : "${replaceRows[x][y]}".split('')[i + j],
+                                                                                            style: const TextStyle(
+                                                                                              fontSize: 10,
+                                                                                              color: Color(0xFFF1AA9B),
                                                                                             ),
                                                                                           ),
                                                                                         ),
-                                                                                    ],
-                                                                                  ),
+                                                                                      ),
+                                                                                  ],
                                                                                 ),
                                                                               ),
-                                                                          ],
-                                                                        )
-                                                                      : Text(
-                                                                          replaceRows[x][y] != "0"
-                                                                              ? replaceRows[x][y].toString()
-                                                                              : "",
-                                                                          style:
-                                                                              const TextStyle(
-                                                                            fontSize:
-                                                                                18,
-                                                                            fontWeight:
-                                                                                FontWeight.w300,
-                                                                            color:
-                                                                                Color(0xFFF1AA9B),
-                                                                          ),
+                                                                            ),
+                                                                        ],
+                                                                      )
+                                                                    : Text(
+                                                                        replaceRows[x][y] !=
+                                                                                "0"
+                                                                            ? replaceRows[x][y].toString()
+                                                                            : "",
+                                                                        style:
+                                                                            const TextStyle(
+                                                                          fontSize:
+                                                                              18,
+                                                                          fontWeight:
+                                                                              FontWeight.w300,
+                                                                          color:
+                                                                              Color(0xFFF1AA9B),
                                                                         ),
-                                                                ),
+                                                                      ),
                                                               ),
-                                                  ),
+                                                            ),
                                                 ),
-                                                if (y == 2 || y == 5)
-                                                  const SizedBox(
-                                                    width: 2,
-                                                  ),
-                                              ],
-                                            )),
-                                        ],
-                                      ),
+                                              ),
+                                              if (y == 2 || y == 5)
+                                                const SizedBox(
+                                                  width: 2,
+                                                ),
+                                            ],
+                                          )),
+                                      ],
                                     ),
-                                    if (x == 2 || x == 5)
-                                      const SizedBox(
-                                        height: 2,
-                                      ),
-                                  ],
-                                ),
+                                  ),
+                                  if (x == 2 || x == 5)
+                                    const SizedBox(
+                                      height: 2,
+                                    ),
+                                ],
                               ),
-                          ],
-                        ),
-                      );
-                    }),
+                            ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
               const SizedBox(
                 height: 8,
