@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sudoku/screens/sudoku_screen.dart';
+
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'dil.dart';
 
 class Giris extends StatefulWidget {
-  const Giris({Key? key}) : super(key: key);
+  const Giris({final Key? key}) : super(key: key);
 
   @override
   _GirisState createState() => _GirisState();
@@ -16,6 +17,7 @@ class _GirisState extends State<Giris> {
   late Box _sudokuKutu;
   Future<Box> _kutuAc() async {
     _sudokuKutu = await Hive.openBox('sudoku');
+    
     return await Hive.openBox('finished_sudokus');
   }
 
@@ -264,7 +266,7 @@ class _GirisState extends State<Giris> {
                                         )
                                       ],
                                     );
-                                  }),
+                                  },),
                         ),
                       ),
                       Expanded(

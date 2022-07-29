@@ -5,11 +5,13 @@ import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:flutter/material.dart';
 import 'package:flutter_sudoku/screens/dil.dart';
 import 'package:flutter_sudoku/screens/giris_screen.dart';
-import 'package:flutter_sudoku/screens/sonuc_screen.dart';
+import 'package:flutter_sudoku/screens/win_screen.dart';
 import 'package:flutter_sudoku/sudokular.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:wakelock/wakelock.dart';
+
+import 'lose_screen.dart';
 
 final Map<String, int> sudokuSeviyeleri = {
   dil['seviye1']: 62,
@@ -35,11 +37,11 @@ class _SudokuState extends State<Sudoku> {
   late String _sudokuString;
 
   bool _note = false;
-  bool _finished = false;
+
+  int hata = 3;
   void _sudokuOlustur() {
     int? gorulecekSayisi = sudokuSeviyeleri[
         _sudokuKutu.get('seviye', defaultValue: dil['seviye2'])];
-
     _sudokuString = sudokular[Random().nextInt(sudokular.length)];
     _sudokuKutu.put('_sudokuString', _sudokuString);
 
@@ -61,14 +63,11 @@ class _SudokuState extends State<Sudoku> {
         i++;
       }
     }
-
+    _sudokuKutu.put('_hata', hata);
     _sudokuKutu.put('sudokuRows', _sudoku);
     _sudokuKutu.put('xy', "99");
     _sudokuKutu.put('ipucu', 39);
     _sudokuKutu.put('sure', 0);
-
-    print(gorulecekSayisi);
-    print(_sudokuString);
   }
 
   void _adimKaydet() {
@@ -84,7 +83,7 @@ class _SudokuState extends State<Sudoku> {
     } else {
       _sudokuString = _sudokuKutu.get('_sudokuString');
       String kontrol = sudoSonDurum.replaceAll(RegExp(r'[e, \][]'), '');
-      print(_sudokuString);
+
       if (kontrol == _sudokuString) {
         // Fluttertoast.showToast(
         //   msg: 'Tebrikler sudokuyu başarıyla bitirdiniz',
@@ -104,7 +103,6 @@ class _SudokuState extends State<Sudoku> {
         _sudokuKutu.put('currentLevel', seviye);
         tamamlananKutusu.add(tamamlananSudoku);
 
-        _finished = true;
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
@@ -121,8 +119,6 @@ class _SudokuState extends State<Sudoku> {
           timeInSecForIosWeb: 1,
         );
       }
-
-      print(kontrol);
     }
   }
 
@@ -136,10 +132,13 @@ class _SudokuState extends State<Sudoku> {
       _sudoku = _sudokuKutu.get('sudokuRows');
     }
 
-    _sayac = Timer.periodic(const Duration(seconds: 1), (timer) {
-      int sure = _sudokuKutu.get('sure');
-      _sudokuKutu.put('sure', ++sure);
-    });
+    _sayac = Timer.periodic(
+      const Duration(seconds: 1),
+      (timer) {
+        int sure = _sudokuKutu.get('sure');
+        _sudokuKutu.put('sure', ++sure);
+      },
+    );
   }
 
   @override
@@ -165,7 +164,9 @@ class _SudokuState extends State<Sudoku> {
             child: IconButton(
               onPressed: () {
                 Navigator.push(
-                    context, MaterialPageRoute(builder: (_) => const Giris()));
+                  context,
+                  MaterialPageRoute(builder: (_) => const Giris()),
+                );
               },
               color: const Color(0xFFF1AA9B),
               icon: const Icon(Icons.arrow_back_ios_outlined),
@@ -191,8 +192,6 @@ class _SudokuState extends State<Sudoku> {
                   _sudoku = onceki[
                       'sudokuRows']; // Sayılar geri alındıktan sonra farklı bir sayı girildiğinde silinen sayıların geri dönmemesi için
                 }
-
-                print(_sudokuHistory.length);
               },
               color: const Color(0xFFF1AA9B),
               icon: const Icon(
@@ -201,20 +200,11 @@ class _SudokuState extends State<Sudoku> {
             ),
           ),
           Expanded(
-            child: IconButton(
-              onPressed: _sudokuOlustur,
-              color: const Color(0xFFF1AA9B),
-              icon: const Icon(
-                Icons.new_label,
-              ),
-            ),
-          ),
-          Expanded(
             child: ValueListenableBuilder<Box>(
               valueListenable: _sudokuKutu.listenable(keys: ['ipucu']),
               builder: (context, box, widget) {
-                return IconButton(
-                  onPressed: () {
+                return InkWell(
+                  onTap: () {
                     String xy = box.get(
                       'xy',
                     );
@@ -240,10 +230,91 @@ class _SudokuState extends State<Sudoku> {
                       }
                     }
                   },
-                  icon: const Icon(
-                    Icons.light_mode,
-                    color: Color(0xFFF1AA9B),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.all(2),
+                          alignment: Alignment.bottomCenter,
+                          child: const Text(
+                            'İpucu',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 15,
+                              color: Color(0xFF98B9F2),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.all(2),
+                          child: Stack(
+                            children: [
+                              // const Icon(
+                              //   Icons.lightbulb_rounded,
+                              //   color: Color(0xFF98B9F2),
+                              // ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF98B9F2),
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: Container(
+                                  margin: const EdgeInsets.all(4),
+                                  child: Text(
+                                    box.get("ipucu").toString(),
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                );
+              },
+            ),
+          ),
+          Expanded(
+            child: ValueListenableBuilder<Box>(
+              valueListenable: _sudokuKutu.listenable(keys: ['hata']),
+              builder: (context, box, child) {
+                return Column(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.all(2),
+                        alignment: Alignment.bottomCenter,
+                        child: const Text(
+                          'Hatalar',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 15,
+                            color: Color(0xFFFE4A49),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        alignment: Alignment.center,
+                        margin: const EdgeInsets.all(2),
+                        child: Text(
+                          "${box.get('_hata')} / 3",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 15,
+                            color: Color(0xFFFE4A49),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 );
               },
             ),
@@ -268,16 +339,27 @@ class _SudokuState extends State<Sudoku> {
                         yC = int.parse(xy.substring(1));
                     List? sudokuRows = box.get('sudokuRows');
                     var replaceRows = sudokuRows;
+                    String cozumString = _sudokuKutu.get('_sudokuString');
+
+                    List cozumSudoku = List.generate(
+                      9,
+                      (index) => List.generate(
+                        9,
+                        (j) => cozumString
+                            .substring(index * 9, (index + 1) * 9)
+                            .split("")[j],
+                      ),
+                    );
                     return Container(
-                      padding: const EdgeInsets.all(3),
+                      // padding: const EdgeInsets.all(3),
                       margin: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: const Color(0xFF0F110C),
-                        borderRadius: BorderRadius.circular(15),
-                        // border: Border.all(
-                        //   width: 1,
-                        //   color: const Color(0xFFCCFCCB),
-                        // ),
+                        // borderRadius: BorderRadius.circular(15),
+                        border: Border.all(
+                          width: 2,
+                          color: const Color(0xFF86626E),
+                        ),
                       ),
                       child: Column(
                         children: <Widget>[
@@ -290,111 +372,132 @@ class _SudokuState extends State<Sudoku> {
                                       children: [
                                         for (int y = 0; y < 9; y++)
                                           Expanded(
-                                              child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                    color: xC == x && yC == y
-                                                        ? const Color(
-                                                            0xFF541690)
-                                                        : xC == x || yC == y
-                                                            ? const Color(
-                                                                0xFF48426D)
-                                                            : const Color(
-                                                                0xFF312C51),
-                                                  ),
-                                                  margin:
-                                                      const EdgeInsets.all(1.2),
-                                                  alignment: Alignment.center,
-                                                  child:
-                                                      "${replaceRows![x][y]}"
-                                                              .startsWith("e")
-                                                          ? Text(
-                                                              replaceRows[x][y]
-                                                                  .toString()
-                                                                  .substring(1),
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                fontSize: 20,
-                                                                color: Color(
-                                                                    0xFFF1AA9B),
-                                                              ),
-                                                            )
-                                                          : InkWell(
-                                                              onTap: () {
-                                                                _sudokuKutu.put(
-                                                                    'xy',
-                                                                    "$x$y");
-                                                              },
-                                                              child: Center(
-                                                                child: "${replaceRows[x][y]}"
-                                                                            .length >
-                                                                        8
-                                                                    ? Column(
-                                                                        children: [
-                                                                          for (int i = 0;
-                                                                              i < 9;
-                                                                              i += 3)
-                                                                            Expanded(
-                                                                              child: Center(
-                                                                                child: Row(
-                                                                                  children: [
-                                                                                    for (int j = 0; j < 3; j++)
-                                                                                      Expanded(
-                                                                                        child: Center(
-                                                                                          child: Text(
-                                                                                            "${replaceRows[x][y]}".split('')[i + j] == "0" ? "" : "${replaceRows[x][y]}".split('')[i + j],
-                                                                                            style: const TextStyle(
-                                                                                              fontSize: 10,
-                                                                                              color: Color(0xFFF1AA9B),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      // borderRadius:
+                                                      //     BorderRadius.circular(
+                                                      //         5),
+                                                      border: Border.all(
+                                                        width: 1,
+                                                        color: const Color(
+                                                            0xFF86626E),
+                                                      ),
+                                                      color: xC == x && yC == y
+                                                          ? const Color(
+                                                              0xFF541690)
+                                                          : xC == x || yC == y
+                                                              ? const Color(
+                                                                  0xFF48426D)
+                                                              : const Color(
+                                                                  0xFF312C51),
+                                                    ),
+                                                    // margin:
+                                                    //     const EdgeInsets.all(
+                                                    //         0.8),
+                                                    alignment: Alignment.center,
+                                                    child:
+                                                        "${replaceRows![x][y]}"
+                                                                .startsWith("e")
+                                                            ? Text(
+                                                                replaceRows[x]
+                                                                        [y]
+                                                                    .toString()
+                                                                    .substring(
+                                                                        1),
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  fontSize: 20,
+                                                                  color: Color(
+                                                                      0xFFF1AA9B),
+                                                                ),
+                                                              )
+                                                            : InkWell(
+                                                                onTap: () {
+                                                                  _sudokuKutu.put(
+                                                                      'xy',
+                                                                      "$x$y");
+                                                                },
+                                                                child: Center(
+                                                                  child: "${replaceRows[x][y]}"
+                                                                              .length >
+                                                                          8
+                                                                      ? Column(
+                                                                          children: [
+                                                                            for (int i = 0;
+                                                                                i < 9;
+                                                                                i += 3)
+                                                                              Expanded(
+                                                                                child: Center(
+                                                                                  child: Row(
+                                                                                    children: [
+                                                                                      for (int j = 0; j < 3; j++)
+                                                                                        Expanded(
+                                                                                          child: Center(
+                                                                                            child: Text(
+                                                                                              "${replaceRows[x][y]}".split('')[i + j] == "0" ? "" : "${replaceRows[x][y]}".split('')[i + j],
+                                                                                              style: const TextStyle(
+                                                                                                fontSize: 10,
+                                                                                                color: Color(0xFFF1AA9B),
+                                                                                              ),
                                                                                             ),
                                                                                           ),
                                                                                         ),
-                                                                                      ),
-                                                                                  ],
+                                                                                    ],
+                                                                                  ),
                                                                                 ),
                                                                               ),
-                                                                            ),
-                                                                        ],
-                                                                      )
-                                                                    : Text(
-                                                                        replaceRows[x][y] !=
-                                                                                "0"
-                                                                            ? replaceRows[x][y].toString()
-                                                                            : "",
-                                                                        style:
-                                                                            const TextStyle(
-                                                                          fontSize:
-                                                                              18,
-                                                                          fontWeight:
-                                                                              FontWeight.w300,
-                                                                          color:
-                                                                              Color(0xFFF1AA9B),
+                                                                          ],
+                                                                        )
+                                                                      : Text(
+                                                                          replaceRows[x][y] != "0"
+                                                                              ? replaceRows[x][y].toString()
+                                                                              : "",
+                                                                          style:
+                                                                              TextStyle(
+                                                                            fontSize:
+                                                                                20,
+                                                                            //Renk Ayarlanacak
+                                                                            color: replaceRows[x][y] == cozumSudoku[x][y]
+                                                                                ? const Color(0xFFDAFFED)
+                                                                                : const Color(0xFFFE4A49),
+                                                                          ),
                                                                         ),
-                                                                      ),
+                                                                ),
                                                               ),
-                                                            ),
+                                                  ),
                                                 ),
-                                              ),
-                                              if (y == 2 || y == 5)
-                                                const SizedBox(
-                                                  width: 2,
-                                                ),
-                                            ],
-                                          )),
+                                                if (y == 2 || y == 5)
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                        width: 2,
+                                                        color: const Color(
+                                                            0xFF86626E),
+                                                      ),
+                                                    ),
+                                                    // width: 2,
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
                                       ],
                                     ),
                                   ),
                                   if (x == 2 || x == 5)
-                                    const SizedBox(
-                                      height: 2,
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          width: 2,
+                                          color: const Color(0xFF86626E),
+                                        ),
+                                      ),
+                                      // width: 2,
                                     ),
                                 ],
                               ),
@@ -418,7 +521,7 @@ class _SudokuState extends State<Sudoku> {
                         borderRadius: BorderRadius.circular(5),
                         border: Border.all(
                           width: 1,
-                          color: const Color(0xFFF1AA9B),
+                          color: const Color(0xFF46237A),
                         ),
                       ),
                       child: Text(
@@ -434,40 +537,41 @@ class _SudokuState extends State<Sudoku> {
                       child: Padding(
                         padding: const EdgeInsets.only(right: 8.0),
                         child: ValueListenableBuilder<Box>(
-                            valueListenable:
-                                _sudokuKutu.listenable(keys: ['sure']),
-                            builder: (context, box, widget) {
-                              String sure =
-                                  Duration(seconds: box.get('sure')).toString();
-                              return Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
-                                    width: 1,
-                                    color: const Color(0xFFF1AA9B),
-                                  ),
+                          valueListenable:
+                              _sudokuKutu.listenable(keys: ['sure']),
+                          builder: (context, box, widget) {
+                            String sure =
+                                Duration(seconds: box.get('sure')).toString();
+                            return Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(
+                                  width: 1,
+                                  color: const Color(0xFFF1AA9B),
                                 ),
-                                child: Row(
-                                  children: [
-                                    const Expanded(
-                                      child: Icon(
-                                        FeatherIcons.clock,
-                                        size: 15,
+                              ),
+                              child: Row(
+                                children: [
+                                  const Expanded(
+                                    child: Icon(
+                                      FeatherIcons.clock,
+                                      size: 15,
+                                      color: Color(0xFFF1AA9B),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      sure.split('.').first,
+                                      style: const TextStyle(
                                         color: Color(0xFFF1AA9B),
                                       ),
                                     ),
-                                    Expanded(
-                                      child: Text(
-                                        sure.split('.').first,
-                                        style: const TextStyle(
-                                          color: Color(0xFFF1AA9B),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -514,6 +618,63 @@ class _SudokuState extends State<Sudoku> {
                                                     if (!_note) {
                                                       _sudoku[xC][yC] =
                                                           "${i + j}";
+
+                                                      setState(() {
+                                                        String xy =
+                                                            _sudokuKutu.get(
+                                                          'xy',
+                                                        );
+                                                        if (_sudokuKutu
+                                                                .get("_hata") >
+                                                            0) {
+                                                          int xC = int.parse(
+                                                                  xy.substring(
+                                                                      0, 1)),
+                                                              yC = int.parse(
+                                                                  xy.substring(
+                                                                      1));
+                                                          String cozumString =
+                                                              _sudokuKutu.get(
+                                                                  '_sudokuString');
+
+                                                          List cozumSudoku =
+                                                              List.generate(
+                                                            9,
+                                                            (index) =>
+                                                                List.generate(
+                                                              9,
+                                                              (j) => cozumString
+                                                                  .substring(
+                                                                      index * 9,
+                                                                      (index +
+                                                                              1) *
+                                                                          9)
+                                                                  .split("")[j],
+                                                            ),
+                                                          );
+                                                          if (_sudoku[xC][yC] !=
+                                                              cozumSudoku[xC]
+                                                                  [yC]) {
+                                                            _sudokuKutu.put(
+                                                                "_hata",
+                                                                _sudokuKutu.get(
+                                                                        "_hata") -
+                                                                    1);
+                                                          }
+                                                        } else if (_sudokuKutu
+                                                                .get("_hata") ==
+                                                            0) {
+                                                          Navigator
+                                                              .pushAndRemoveUntil(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                                builder: (BuildContext
+                                                                        context) =>
+                                                                    const LoseScreen()),
+                                                            (route) => false,
+                                                          );
+                                                        }
+                                                      });
                                                     } else {
                                                       if ("${_sudoku[xC][yC]}"
                                                               .length <
@@ -542,7 +703,6 @@ class _SudokuState extends State<Sudoku> {
                                                     _sudokuKutu.put(
                                                         'sudokuRows', _sudoku);
                                                     _adimKaydet();
-                                                    print("${i + j}");
                                                   }
                                                 },
                                                 child: Container(

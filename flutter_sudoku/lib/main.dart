@@ -20,14 +20,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<Box>(
-        valueListenable:
-            Hive.box('ayarlar').listenable(keys: ['karanlik_tema', 'dil']),
-        builder: (context, box, widget) {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            theme: ThemeData.dark(),
-            home: const Giris(),
-          );
-        });
+      valueListenable:
+          Hive.box('ayarlar').listenable(keys: ['karanlik_tema', 'dil']),
+      builder: (context, box, widget) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData.dark(),
+          home: const Giris(),
+        );
+      },
+    );
   }
 }

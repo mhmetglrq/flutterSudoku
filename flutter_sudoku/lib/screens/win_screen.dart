@@ -90,7 +90,7 @@ class _SonucState extends State<Sonuc> {
                         return Expanded(
                           child: InkWell(
                             onTap: () {
-                              print(box.get('currentLevel'));
+
                               String currentLevel = box.get('currentLevel');
                               if (currentLevel == "Çok Kolay") {
                                 _sudokuKutu.put('seviye', "Kolay");
