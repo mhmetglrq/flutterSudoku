@@ -7,7 +7,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'dil.dart';
 
 class Giris extends StatefulWidget {
-  const Giris({final Key? key}) : super(key: key);
+  final bool lose;
+  const Giris({final Key? key, required this.lose}) : super(key: key);
 
   @override
   _GirisState createState() => _GirisState();
@@ -17,7 +18,7 @@ class _GirisState extends State<Giris> {
   late Box _sudokuKutu;
   Future<Box> _kutuAc() async {
     _sudokuKutu = await Hive.openBox('sudoku');
-    
+
     return await Hive.openBox('finished_sudokus');
   }
 
@@ -29,7 +30,7 @@ class _GirisState extends State<Giris> {
         if (snapshot.hasData) {
           return Scaffold(
             appBar: AppBar(
-              backgroundColor: const Color(0xFF0F110C),
+              backgroundColor: const Color(0xFF3A015C),
               automaticallyImplyLeading: false,
               elevation: 0,
               actions: <Widget>[
@@ -55,7 +56,7 @@ class _GirisState extends State<Giris> {
                 Expanded(
                   child: Center(
                     child: Text(
-                      'SudokuZ',
+                      'SudokuS',
                       style: GoogleFonts.getFont(
                         'Permanent Marker',
                         textStyle: const TextStyle(
@@ -118,7 +119,7 @@ class _GirisState extends State<Giris> {
             ),
             body: Container(
               decoration: const BoxDecoration(
-                color: Color(0xFF0F110C),
+                color: Color(0xFF11001C),
               ),
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
@@ -137,7 +138,7 @@ class _GirisState extends State<Giris> {
                               style: TextStyle(
                                 fontWeight: FontWeight.w400,
                                 fontSize: 22,
-                                color: Color(0xFFF1AA9B),
+                                color: Color(0xFFFAFFFD),
                               ),
                             ),
                           ),
@@ -152,7 +153,7 @@ class _GirisState extends State<Giris> {
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
                               width: 3,
-                              color: const Color(0xFF312C51),
+                              color: const Color(0xFF3A015C),
                             ),
                           ),
                           child: box.length == 0
@@ -252,9 +253,10 @@ class _GirisState extends State<Giris> {
                                                         BorderRadius.circular(
                                                             5),
                                                     border: Border.all(
-                                                        width: 1,
-                                                        color: const Color(
-                                                            0xFF312C51)),
+                                                      width: 1,
+                                                      color: const Color(
+                                                          0xFF3A015C),
+                                                    ),
                                                   ),
                                                   alignment: Alignment.center,
                                                   child: Text(model['seviye']
@@ -266,7 +268,8 @@ class _GirisState extends State<Giris> {
                                         )
                                       ],
                                     );
-                                  },),
+                                  },
+                                ),
                         ),
                       ),
                       Expanded(
@@ -292,7 +295,7 @@ class _GirisState extends State<Giris> {
                                         textStyle: const TextStyle(
                                           fontWeight: FontWeight.w400,
                                           fontSize: 22,
-                                          color: Color(0xFFF1AA9B),
+                                          color: Color(0xFFFAFFFD),
                                         ),
                                       ),
                                     ),
@@ -316,39 +319,38 @@ class _GirisState extends State<Giris> {
                                         child: Row(
                                           children: [
                                             Expanded(
-                                              child: Center(
-                                                child: AspectRatio(
-                                                  aspectRatio: 5,
-                                                  child: Container(
-                                                    margin:
-                                                        const EdgeInsets.all(4),
-                                                    alignment: Alignment.center,
-                                                    decoration: BoxDecoration(
-                                                      color: const Color(
-                                                          0xFF312C51),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5),
-                                                    ),
-                                                    child: InkWell(
-                                                      onTap: () {
-                                                        if (_sudokuKutu
-                                                            .isOpen) {
-                                                          _sudokuKutu.put(
-                                                              'seviye',
-                                                              "İmkansız");
-                                                          _sudokuKutu.put(
-                                                              'sudokuRows',
-                                                              null);
+                                              child: InkWell(
+                                                onTap: () {
+                                                  if (_sudokuKutu.isOpen) {
+                                                    _sudokuKutu.put(
+                                                        'seviye', "İmkansız");
+                                                    _sudokuKutu.put(
+                                                        'sudokuRows', null);
 
-                                                          Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                                builder: (_) =>
-                                                                    const Sudoku()),
-                                                          );
-                                                        }
-                                                      },
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (_) =>
+                                                              const Sudoku()),
+                                                    );
+                                                  }
+                                                },
+                                                child: Center(
+                                                  child: AspectRatio(
+                                                    aspectRatio: 5,
+                                                    child: Container(
+                                                      margin:
+                                                          const EdgeInsets.all(
+                                                              4),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      decoration: BoxDecoration(
+                                                        color: const Color(
+                                                            0xFF3A015C),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5),
+                                                      ),
                                                       child: Text(
                                                         "İmkansız",
                                                         style:
@@ -374,38 +376,38 @@ class _GirisState extends State<Giris> {
                                         child: Row(
                                           children: [
                                             Expanded(
-                                              child: Center(
-                                                child: AspectRatio(
-                                                  aspectRatio: 3,
-                                                  child: Container(
-                                                    margin:
-                                                        const EdgeInsets.all(4),
-                                                    alignment: Alignment.center,
-                                                    decoration: BoxDecoration(
-                                                      color: const Color(
-                                                          0xFF312C51),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5),
-                                                    ),
-                                                    child: InkWell(
-                                                      onTap: () {
-                                                        if (_sudokuKutu
-                                                            .isOpen) {
-                                                          _sudokuKutu.put(
-                                                              'seviye', "Zor");
-                                                          _sudokuKutu.put(
-                                                              'sudokuRows',
-                                                              null);
+                                              child: InkWell(
+                                                onTap: () {
+                                                  if (_sudokuKutu.isOpen) {
+                                                    _sudokuKutu.put(
+                                                        'seviye', "Zor");
+                                                    _sudokuKutu.put(
+                                                        'sudokuRows', null);
 
-                                                          Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                                builder: (_) =>
-                                                                    const Sudoku()),
-                                                          );
-                                                        }
-                                                      },
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (_) =>
+                                                              const Sudoku()),
+                                                    );
+                                                  }
+                                                },
+                                                child: Center(
+                                                  child: AspectRatio(
+                                                    aspectRatio: 3,
+                                                    child: Container(
+                                                      margin:
+                                                          const EdgeInsets.all(
+                                                              4),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      decoration: BoxDecoration(
+                                                        color: const Color(
+                                                            0xFF3A015C),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5),
+                                                      ),
                                                       child: Text(
                                                         "Zor",
                                                         style:
@@ -425,39 +427,38 @@ class _GirisState extends State<Giris> {
                                             ),
                                             //Çok Zor
                                             Expanded(
-                                              child: Center(
-                                                child: AspectRatio(
-                                                  aspectRatio: 3,
-                                                  child: Container(
-                                                    margin:
-                                                        const EdgeInsets.all(4),
-                                                    alignment: Alignment.center,
-                                                    decoration: BoxDecoration(
-                                                      color: const Color(
-                                                          0xFF312C51),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5),
-                                                    ),
-                                                    child: InkWell(
-                                                      onTap: () {
-                                                        if (_sudokuKutu
-                                                            .isOpen) {
-                                                          _sudokuKutu.put(
-                                                              'seviye',
-                                                              "Çok Zor");
-                                                          _sudokuKutu.put(
-                                                              'sudokuRows',
-                                                              null);
+                                              child: InkWell(
+                                                onTap: () {
+                                                  if (_sudokuKutu.isOpen) {
+                                                    _sudokuKutu.put(
+                                                        'seviye', "Çok Zor");
+                                                    _sudokuKutu.put(
+                                                        'sudokuRows', null);
 
-                                                          Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                                builder: (_) =>
-                                                                    const Sudoku()),
-                                                          );
-                                                        }
-                                                      },
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (_) =>
+                                                              const Sudoku()),
+                                                    );
+                                                  }
+                                                },
+                                                child: Center(
+                                                  child: AspectRatio(
+                                                    aspectRatio: 3,
+                                                    child: Container(
+                                                      margin:
+                                                          const EdgeInsets.all(
+                                                              4),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      decoration: BoxDecoration(
+                                                        color: const Color(
+                                                            0xFF3A015C),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5),
+                                                      ),
                                                       child: Text(
                                                         "Çok Zor",
                                                         style:
@@ -483,36 +484,35 @@ class _GirisState extends State<Giris> {
                                         child: Row(
                                           children: [
                                             Expanded(
-                                              child: AspectRatio(
-                                                aspectRatio: 1,
-                                                child: Container(
-                                                  margin:
-                                                      const EdgeInsets.all(4),
-                                                  alignment: Alignment.center,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
-                                                    color:
-                                                        const Color(0xFF312C51),
-                                                  ),
-                                                  child: InkWell(
-                                                    onTap: () {
-                                                      if (_sudokuKutu.isOpen) {
-                                                        _sudokuKutu.put(
-                                                            'seviye',
-                                                            "Çok Kolay");
-                                                        _sudokuKutu.put(
-                                                            'sudokuRows', null);
+                                              child: InkWell(
+                                                onTap: () {
+                                                  if (_sudokuKutu.isOpen) {
+                                                    _sudokuKutu.put(
+                                                        'seviye', "Çok Kolay");
+                                                    _sudokuKutu.put(
+                                                        'sudokuRows', null);
 
-                                                        Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (_) =>
-                                                                  const Sudoku()),
-                                                        );
-                                                      }
-                                                    },
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (_) =>
+                                                              const Sudoku()),
+                                                    );
+                                                  }
+                                                },
+                                                child: AspectRatio(
+                                                  aspectRatio: 1,
+                                                  child: Container(
+                                                    margin:
+                                                        const EdgeInsets.all(4),
+                                                    alignment: Alignment.center,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5),
+                                                      color: const Color(
+                                                          0xFF3A015C),
+                                                    ),
                                                     child: Text(
                                                       "Çok Kolay",
                                                       style: GoogleFonts.oswald(
@@ -529,35 +529,35 @@ class _GirisState extends State<Giris> {
                                               ),
                                             ),
                                             Expanded(
-                                              child: AspectRatio(
-                                                aspectRatio: 1,
-                                                child: Container(
-                                                  margin:
-                                                      const EdgeInsets.all(4),
-                                                  alignment: Alignment.center,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
-                                                    color:
-                                                        const Color(0xFF312C51),
-                                                  ),
-                                                  child: InkWell(
-                                                    onTap: () {
-                                                      if (_sudokuKutu.isOpen) {
-                                                        _sudokuKutu.put(
-                                                            'seviye', "Kolay");
-                                                        _sudokuKutu.put(
-                                                            'sudokuRows', null);
+                                              child: InkWell(
+                                                onTap: () {
+                                                  if (_sudokuKutu.isOpen) {
+                                                    _sudokuKutu.put(
+                                                        'seviye', "Kolay");
+                                                    _sudokuKutu.put(
+                                                        'sudokuRows', null);
 
-                                                        Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (_) =>
-                                                                  const Sudoku()),
-                                                        );
-                                                      }
-                                                    },
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (_) =>
+                                                              const Sudoku()),
+                                                    );
+                                                  }
+                                                },
+                                                child: AspectRatio(
+                                                  aspectRatio: 1,
+                                                  child: Container(
+                                                    margin:
+                                                        const EdgeInsets.all(4),
+                                                    alignment: Alignment.center,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5),
+                                                      color: const Color(
+                                                          0xFF3A015C),
+                                                    ),
                                                     child: Text(
                                                       "Kolay",
                                                       style: GoogleFonts.oswald(
@@ -574,35 +574,35 @@ class _GirisState extends State<Giris> {
                                               ),
                                             ),
                                             Expanded(
-                                              child: AspectRatio(
-                                                aspectRatio: 1,
-                                                child: Container(
-                                                  margin:
-                                                      const EdgeInsets.all(4),
-                                                  alignment: Alignment.center,
-                                                  decoration: BoxDecoration(
-                                                    color:
-                                                        const Color(0xFF312C51),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
-                                                  ),
-                                                  child: InkWell(
-                                                    onTap: () {
-                                                      if (_sudokuKutu.isOpen) {
-                                                        _sudokuKutu.put(
-                                                            'seviye', "Orta");
-                                                        _sudokuKutu.put(
-                                                            'sudokuRows', null);
+                                              child: InkWell(
+                                                onTap: () {
+                                                  if (_sudokuKutu.isOpen) {
+                                                    _sudokuKutu.put(
+                                                        'seviye', "Orta");
+                                                    _sudokuKutu.put(
+                                                        'sudokuRows', null);
 
-                                                        Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (_) =>
-                                                                  const Sudoku()),
-                                                        );
-                                                      }
-                                                    },
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (_) =>
+                                                              const Sudoku()),
+                                                    );
+                                                  }
+                                                },
+                                                child: AspectRatio(
+                                                  aspectRatio: 1,
+                                                  child: Container(
+                                                    margin:
+                                                        const EdgeInsets.all(4),
+                                                    alignment: Alignment.center,
+                                                    decoration: BoxDecoration(
+                                                      color: const Color(
+                                                          0xFF3A015C),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5),
+                                                    ),
                                                     child: Text(
                                                       "Orta",
                                                       style: GoogleFonts.oswald(
@@ -626,31 +626,32 @@ class _GirisState extends State<Giris> {
                                 ),
                               ),
                               //Eski Oyun
-                              if (_sudokuKutu.get('sudokuRows') != null)
+                              if (_sudokuKutu.get('sudokuRows') != null &&
+                                  widget.lose == false)
                                 Expanded(
                                   flex: 1,
-                                  child: Container(
-                                    margin: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
+                                  child: InkWell(
+                                    onTap: () {
+                                      {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (_) => const Sudoku()),
+                                        );
+                                      }
+                                    },
                                     child: Container(
+                                      margin: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(5),
-                                        color: const Color(0xFF312C51),
                                       ),
-                                      alignment: Alignment.center,
-                                      child: InkWell(
-                                        onTap: () {
-                                          {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (_) =>
-                                                      const Sudoku()),
-                                            );
-                                          }
-                                        },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          color: const Color(0xFF3A015C),
+                                        ),
+                                        alignment: Alignment.center,
                                         child: Text(
                                           "Eski oyuna devam et",
                                           style: GoogleFonts.oswald(

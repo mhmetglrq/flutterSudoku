@@ -52,10 +52,11 @@ class _SonucState extends State<Sonuc> {
                         Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                            builder: (BuildContext context) => const Giris(),
+                            builder: (BuildContext context) => const Giris(lose: false,),
                           ),
                           (route) => false,
                         );
+                        _sudokuKutu.put('sudokuRows', null);
                       },
                       child: AspectRatio(
                         aspectRatio: 1,
@@ -90,7 +91,7 @@ class _SonucState extends State<Sonuc> {
                         return Expanded(
                           child: InkWell(
                             onTap: () {
-
+                              _sudokuKutu.put('sudokuRows', null);
                               String currentLevel = box.get('currentLevel');
                               if (currentLevel == "Çok Kolay") {
                                 _sudokuKutu.put('seviye', "Kolay");
