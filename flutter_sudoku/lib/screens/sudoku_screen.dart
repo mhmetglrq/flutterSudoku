@@ -66,7 +66,7 @@ class _SudokuState extends State<Sudoku> {
     _sudokuKutu.put('_hata', hata);
     _sudokuKutu.put('sudokuRows', _sudoku);
     _sudokuKutu.put('xy', "99");
-    _sudokuKutu.put('ipucu', 39);
+    _sudokuKutu.put('ipucu', 3);
     _sudokuKutu.put('sure', 0);
   }
 
