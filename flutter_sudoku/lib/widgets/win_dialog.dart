@@ -64,6 +64,19 @@ class _WinDialogState extends State<WinDialog> {
                   valueListenable:
                       _sudokuKutu.listenable(keys: ['currentLevel']),
                   builder: (context, box, snapshot) {
+                    if (box.get('currentLevel') == "Çok Kolay") {
+                      _sudokuKutu.put('nextLevel', 'Kolay');
+                    } else if (box.get('currentLevel') == "Kolay") {
+                      _sudokuKutu.put('nextLevel', 'Orta');
+                    } else if (box.get('currentLevel') == "Orta") {
+                      _sudokuKutu.put('nextLevel', 'Zor');
+                    } else if (box.get('currentLevel') == "Zor") {
+                      _sudokuKutu.put('nextLevel', 'Çok Zor');
+                    } else if (box.get('currentLevel') == "Çok Zor") {
+                      _sudokuKutu.put('nextLevel', 'İmkansız');
+                    } else if (box.get('currentLevel') == "İmkansız") {
+                      _sudokuKutu.put('nextLevel', 'İmkansız');
+                    }
                     return Container(
                       margin: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
@@ -73,6 +86,7 @@ class _WinDialogState extends State<WinDialog> {
                       child: MaterialButton(
                         onPressed: () {
                           _sudokuKutu.put('sudokuRows', null);
+
                           String currentLevel = box.get('currentLevel');
                           if (currentLevel == "Çok Kolay") {
                             _sudokuKutu.put('nextLevel', 'Kolay');
@@ -146,17 +160,19 @@ class _WinDialogState extends State<WinDialog> {
                           }
                         },
                         child: Container(
-                          margin: const EdgeInsets.all(20),
+                          margin: const EdgeInsets.all(5),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
                               color: const Color(0xFF6184D8)),
                           alignment: Alignment.center,
                           child: Text(
-                            'Sonraki Seviyeye Geç ${_sudokuKutu.get('nextLevel')}',
+                            'Sonraki Seviyeye Geç \n'
+                            '${_sudokuKutu.get('nextLevel')}',
                             style: const TextStyle(
                               color: Color(0xFFDAFFED),
                               fontSize: 15,
                             ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
                       ),
@@ -177,7 +193,17 @@ class _WinDialogState extends State<WinDialog> {
                                   lose: true,
                                 ),
                               ),
-                              (route) => false).then((value) => _clearBox());
+                              (route) => false);
+                          Future.delayed(
+                            const Duration(milliseconds: 500),
+                            () {
+                              _clearBox();
+
+                              setState(() {
+                                // Here you can write your code for open new view
+                              });
+                            },
+                          );
                         },
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),

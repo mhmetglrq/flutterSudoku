@@ -100,7 +100,14 @@ class _LoseDialogState extends State<LoseDialog> {
                                   lose: true,
                                 ),
                               ),
-                              (route) => false).then((value) => _clearBox());
+                              (route) => false);
+                          Future.delayed(const Duration(milliseconds: 100), () {
+                            _clearBox();
+
+                            setState(() {
+                              // Here you can write your code for open new view
+                            });
+                          });
                         },
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
