@@ -7,6 +7,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 void main() async {
   await Hive.initFlutter('sudoku');
   await Hive.openBox('ayarlar');
+  Hive.box('ayarlar').put('tema', 'dark');
   LicenseRegistry.addLicense(() async* {
     final license = await rootBundle.loadString('google_fonts/LICENSE.txt');
     yield LicenseEntryWithLineBreaks(['google_fonts'], license);
