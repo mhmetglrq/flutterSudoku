@@ -110,104 +110,95 @@ class _WinDialogState extends State<WinDialog> {
                                         "İmkansız") {
                                       _sudokuKutu.put('nextLevel', 'İmkansız');
                                     }
-                                    return Container(
-                                      margin: const EdgeInsets.all(20),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        color: themeBox.get('tema') == 'dark'
-                                            ? dialogDarkTryAgainOrNextButtonColor
-                                            : dialogLightTryAgainOrNextButtonColor,
-                                      ),
-                                      alignment: Alignment.center,
-                                      child: MaterialButton(
-                                        onPressed: () {
+                                    return InkWell(
+                                      onTap: () {
+                                        _sudokuKutu.put('sudokuRows', null);
+
+                                        String currentLevel =
+                                            box.get('currentLevel');
+                                        if (currentLevel == "Çok Kolay") {
+                                          _sudokuKutu.put('nextLevel', 'Kolay');
+                                          _sudokuKutu.put('seviye', "Kolay");
                                           _sudokuKutu.put('sudokuRows', null);
+                                          nextLevelName = 'Kolay';
+                                          Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (BuildContext context) =>
+                                                  const Sudoku(),
+                                            ),
+                                            (route) => false,
+                                          );
+                                        } else if (currentLevel == "Kolay") {
+                                          _sudokuKutu.put('nextLevel', 'Orta');
+                                          _sudokuKutu.put('seviye', "Orta");
+                                          _sudokuKutu.put('sudokuRows', null);
+                                          nextLevelName = 'Orta';
+                                          Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (BuildContext context) =>
+                                                  const Sudoku(),
+                                            ),
+                                            (route) => false,
+                                          );
+                                        } else if (currentLevel == "Orta") {
+                                          _sudokuKutu.put('nextLevel', 'Zor');
 
-                                          String currentLevel =
-                                              box.get('currentLevel');
-                                          if (currentLevel == "Çok Kolay") {
-                                            _sudokuKutu.put(
-                                                'nextLevel', 'Kolay');
-                                            _sudokuKutu.put('seviye', "Kolay");
-                                            _sudokuKutu.put('sudokuRows', null);
-                                            nextLevelName = 'Kolay';
-                                            Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder:
-                                                    (BuildContext context) =>
-                                                        const Sudoku(),
-                                              ),
-                                              (route) => false,
-                                            );
-                                          } else if (currentLevel == "Kolay") {
-                                            _sudokuKutu.put(
-                                                'nextLevel', 'Orta');
-                                            _sudokuKutu.put('seviye', "Orta");
-                                            _sudokuKutu.put('sudokuRows', null);
-                                            nextLevelName = 'Orta';
-                                            Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder:
-                                                    (BuildContext context) =>
-                                                        const Sudoku(),
-                                              ),
-                                              (route) => false,
-                                            );
-                                          } else if (currentLevel == "Orta") {
-                                            _sudokuKutu.put('nextLevel', 'Zor');
+                                          _sudokuKutu.put('seviye', "Zor");
+                                          _sudokuKutu.put('sudokuRows', null);
+                                          nextLevelName = 'Zor';
+                                          Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (BuildContext context) =>
+                                                  const Sudoku(),
+                                            ),
+                                            (route) => false,
+                                          );
+                                        } else if (currentLevel == "Zor") {
+                                          _sudokuKutu.put(
+                                              'nextLevel', 'Çok Zor');
 
-                                            _sudokuKutu.put('seviye', "Zor");
-                                            _sudokuKutu.put('sudokuRows', null);
-                                            nextLevelName = 'Zor';
-                                            Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder:
-                                                    (BuildContext context) =>
-                                                        const Sudoku(),
-                                              ),
-                                              (route) => false,
-                                            );
-                                          } else if (currentLevel == "Zor") {
-                                            _sudokuKutu.put(
-                                                'nextLevel', 'Çok Zor');
+                                          _sudokuKutu.put('seviye', "Çok Zor");
+                                          _sudokuKutu.put('sudokuRows', null);
+                                          nextLevelName = 'Çok Zor';
+                                          Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (BuildContext context) =>
+                                                  const Sudoku(),
+                                            ),
+                                            (route) => false,
+                                          );
+                                        } else if (currentLevel == "Çok Zor") {
+                                          _sudokuKutu.put(
+                                              'nextLevel', 'İmkansız');
 
-                                            _sudokuKutu.put(
-                                                'seviye', "Çok Zor");
-                                            _sudokuKutu.put('sudokuRows', null);
-                                            nextLevelName = 'Çok Zor';
-                                            Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder:
-                                                    (BuildContext context) =>
-                                                        const Sudoku(),
-                                              ),
-                                              (route) => false,
-                                            );
-                                          } else if (currentLevel ==
-                                              "Çok Zor") {
-                                            _sudokuKutu.put(
-                                                'nextLevel', 'İmkansız');
+                                          _sudokuKutu.put('seviye', "İmkansız");
+                                          _sudokuKutu.put('sudokuRows', null);
+                                          nextLevelName = 'İmkansız';
 
-                                            _sudokuKutu.put(
-                                                'seviye', "İmkansız");
-                                            _sudokuKutu.put('sudokuRows', null);
-                                            nextLevelName = 'İmkansız';
-
-                                            Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder:
-                                                    (BuildContext context) =>
-                                                        const Sudoku(),
-                                              ),
-                                              (route) => false,
-                                            );
-                                          }
-                                        },
+                                          Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (BuildContext context) =>
+                                                  const Sudoku(),
+                                            ),
+                                            (route) => false,
+                                          );
+                                        }
+                                      },
+                                      child: Container(
+                                        margin: const EdgeInsets.all(20),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          color: themeBox.get('tema') == 'dark'
+                                              ? dialogDarkTryAgainOrNextButtonColor
+                                              : dialogLightTryAgainOrNextButtonColor,
+                                        ),
+                                        alignment: Alignment.center,
                                         child: Container(
                                           margin: const EdgeInsets.all(5),
                                           decoration: BoxDecoration(

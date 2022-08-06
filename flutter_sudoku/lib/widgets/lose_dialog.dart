@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sudoku/screens/color.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../screens/giris_screen.dart';
 import '../screens/sudoku_screen.dart';
 
 class LoseDialog extends StatefulWidget {
-  const LoseDialog({Key? key}) : super(key: key);
+  RewardedAd? rewardedAd;
+  bool isLoaded;
+  LoseDialog({Key? key, required this.isLoaded, required this.rewardedAd})
+      : super(key: key);
 
   @override
   State<LoseDialog> createState() => _LoseDialogState();
@@ -15,11 +20,18 @@ class LoseDialog extends StatefulWidget {
 class _LoseDialogState extends State<LoseDialog> {
   final Box _sudokuKutu = Hive.box('sudoku');
   Future<Box> _temaKutuAc() async {
+    await Hive.openBox('sudoku');
     return await Hive.openBox('ayarlar');
   }
 
   _clearBox() {
     _sudokuKutu.put('sudokuRows', null);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 
   @override
@@ -85,36 +97,56 @@ class _LoseDialogState extends State<LoseDialog> {
                                 ),
                               ),
                             ),
-                            Container(
-                              margin: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: themeBox.get('tema') == 'dark'
-                                    ? dialogDarkTryAgainOrNextButtonColor
-                                    : dialogLightTryAgainOrNextButtonColor,
-                              ),
-                              alignment: Alignment.center,
-                              child: MaterialButton(
-                                onPressed: () {},
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'İkinci Şans',
-                                      style: TextStyle(
+                            InkWell(
+                              onTap: () {
+                                if (widget.isLoaded) {
+                                  widget.rewardedAd!.show(onUserEarnedReward:
+                                      (AdWithoutView ad, RewardItem reward) {
+                                    _sudokuKutu.put('_hata', 1);
+
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (_) => const Sudoku()),
+                                    );
+                                    print("${reward.amount} ${reward.type}");
+                                  });
+                                } else {
+                                  Fluttertoast.showToast(
+                                      msg:
+                                          'Daha reklam yüklenmedi. Lütfen biraz bekleyiniz.');
+                                }
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.all(15),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: themeBox.get('tema') == 'dark'
+                                      ? dialogDarkTryAgainOrNextButtonColor
+                                      : dialogLightTryAgainOrNextButtonColor,
+                                ),
+                                child: Container(
+                                  margin: const EdgeInsets.all(8),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'İkinci Şans',
+                                        style: TextStyle(
+                                          color: themeBox.get('tema') == 'dark'
+                                              ? dialogDarkIconandTextColor
+                                              : dialogLightIconandTextColor,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.smart_display_outlined,
                                         color: themeBox.get('tema') == 'dark'
                                             ? dialogDarkIconandTextColor
                                             : dialogLightIconandTextColor,
-                                        fontSize: 15,
                                       ),
-                                    ),
-                                    Icon(
-                                      Icons.smart_display_outlined,
-                                      color: themeBox.get('tema') == 'dark'
-                                          ? dialogDarkIconandTextColor
-                                          : dialogLightIconandTextColor,
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -125,6 +157,7 @@ class _LoseDialogState extends State<LoseDialog> {
                                   child: Container(
                                     alignment: Alignment.center,
                                     child: MaterialButton(
+                                      splashColor: Colors.transparent,
                                       onPressed: () {
                                         Navigator.pushAndRemoveUntil(
                                             context,
@@ -167,6 +200,7 @@ class _LoseDialogState extends State<LoseDialog> {
                                   child: Container(
                                     alignment: Alignment.center,
                                     child: MaterialButton(
+                                      splashColor: Colors.transparent,
                                       onPressed: () {
                                         _clearBox();
                                         Navigator.push(

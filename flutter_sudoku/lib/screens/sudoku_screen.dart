@@ -1,14 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
+import 'package:flutter/services.dart';
 import "package:flutter_feather_icons/flutter_feather_icons.dart";
 import 'package:flutter/material.dart';
+import 'package:flutter_sudoku/helpers/ad_manager.dart';
 import 'package:flutter_sudoku/screens/color.dart';
 import 'package:flutter_sudoku/widgets/lose_dialog.dart';
 import 'package:flutter_sudoku/screens/dil.dart';
 import 'package:flutter_sudoku/screens/giris_screen.dart';
 import 'package:flutter_sudoku/sudokular.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:wakelock/wakelock.dart';
 
@@ -32,11 +35,11 @@ class Sudoku extends StatefulWidget {
 
 class _SudokuState extends State<Sudoku> {
   final Box _sudokuKutu = Hive.box('sudoku');
-
+  RewardedAd? _rewardedIpucuAd;
   List _sudoku = [], _sudokuHistory = [];
   late Timer _sayac;
   late String _sudokuString;
-
+  bool isIpucuLoaded = false;
   bool _note = false;
   Future<Box> _temaKutuAc() async {
     return await Hive.openBox('ayarlar');
@@ -133,16 +136,55 @@ class _SudokuState extends State<Sudoku> {
     }
   }
 
+  final adManager = AdManager();
+
+  bool isLoaded = false;
+  RewardedAd? _rewardedAd;
+
+  void _loadRewardedAd() {
+    RewardedAd.load(
+      adUnitId: "ca-app-pub-1137260032650081/2315096902",
+      request: const AdRequest(),
+      rewardedAdLoadCallback: RewardedAdLoadCallback(
+        onAdLoaded: (ad) {
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              setState(() {
+                ad.dispose();
+                _rewardedAd = null;
+              });
+              _loadRewardedAd();
+            },
+          );
+
+          setState(() {
+            isLoaded = true;
+            _rewardedAd = ad;
+          });
+        },
+        onAdFailedToLoad: (err) {
+          print('Failed to load a rewarded ad: ${err.message}');
+        },
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     Wakelock.enable();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     if (_sudokuKutu.get('sudokuRows') == null) {
       _sudokuOlustur();
     } else {
       _sudoku = _sudokuKutu.get('sudokuRows');
     }
+    adManager.addAds(false, false, true);
 
+    _loadRewardedAd();
     _sayac = Timer.periodic(
       const Duration(seconds: 1),
       (timer) {
@@ -158,6 +200,7 @@ class _SudokuState extends State<Sudoku> {
     if (_sayac != null && _sayac.isActive) {
       _sayac.cancel();
     }
+    _rewardedAd!.dispose();
     Wakelock.disable();
     super.dispose();
   }
@@ -185,6 +228,9 @@ class _SudokuState extends State<Sudoku> {
                       actions: [
                         Expanded(
                           child: IconButton(
+                            splashColor: Colors.transparent,
+                            focusColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
                             onPressed: () {
                               Navigator.push(
                                 context,
@@ -264,6 +310,8 @@ class _SudokuState extends State<Sudoku> {
                                       box.put("ipucu", box.get("ipucu") - 1);
                                       _adimKaydet();
                                     }
+                                  } else if (box.get('ipucu') == 0) {
+                                    adManager.showRewardedAd(context);
                                   }
                                 },
                                 child: Column(
@@ -289,10 +337,10 @@ class _SudokuState extends State<Sudoku> {
                                       child: Container(
                                         margin: const EdgeInsets.all(2),
                                         child: Container(
-                                          decoration: const BoxDecoration(
-                                              // color: const Color(0xFF48BEFF),
-                                              // borderRadius: BorderRadius.circular(30),
-                                              ),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                          ),
                                           child: box.get('ipucu') == 3
                                               ? Icon(
                                                   Icons.looks_3_outlined,
@@ -648,9 +696,9 @@ class _SudokuState extends State<Sudoku> {
                                         valueListenable: _sudokuKutu
                                             .listenable(keys: ['sure']),
                                         builder: (context, box, widget) {
-                                          String sure =
-                                              Duration(seconds: box.get('sure'))
-                                                  .toString();
+                                          String sure = Duration(
+                                            seconds: box.get('sure'),
+                                          ).toString();
                                           return Container(
                                             decoration: BoxDecoration(
                                               borderRadius:
@@ -790,7 +838,10 @@ class _SudokuState extends State<Sudoku> {
                                                                           showDialog(
                                                                               barrierDismissible: false,
                                                                               context: context,
-                                                                              builder: (_) => const LoseDialog(),
+                                                                              builder: (_) => LoseDialog(
+                                                                                    isLoaded: isLoaded,
+                                                                                    rewardedAd: _rewardedAd,
+                                                                                  ),
                                                                               useSafeArea: false);
                                                                         }
                                                                       },

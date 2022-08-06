@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_sudoku/screens/color.dart';
 import 'package:flutter_sudoku/screens/sudoku_screen.dart';
 
@@ -28,6 +29,15 @@ class _GirisState extends State<Giris> {
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -74,15 +84,13 @@ class _GirisState extends State<Giris> {
                         Expanded(
                           child: Center(
                             child: Text(
-                              'sudokuZEN',
-                              style: GoogleFonts.getFont(
-                                'Permanent Marker',
-                                textStyle: TextStyle(
-                                    fontSize: 20,
-                                    color: themeBox.get('tema') == 'dark'
-                                        ? girisDarkBaslikColor
-                                        : girisLightBaslikColor),
-                              ),
+                              'ZENSUDOKU',
+                              style: TextStyle(
+                                  fontFamily: 'Visitor',
+                                  fontSize: 30,
+                                  color: themeBox.get('tema') == 'dark'
+                                      ? girisDarkBaslikColor
+                                      : girisLightBaslikColor),
                             ),
                           ),
                         ),
@@ -102,49 +110,6 @@ class _GirisState extends State<Giris> {
                             },
                           ),
                         ),
-
-                        // if (_sudokuKutu.get('sudokuRows') != null)
-                        //   IconButton(
-                        //     icon: const Icon(Icons.play_circle_outline),
-                        //     onPressed: () {
-                        //       Navigator.push(
-                        //         context,
-                        //         MaterialPageRoute(builder: (_) => const Sudoku()),
-                        //       );
-                        //     },
-                        //   ),
-                        // PopupMenuButton(
-                        //   icon: const Icon(Icons.add),
-                        //   onSelected: (deger) {
-                        //     if (_sudokuKutu.isOpen) {
-                        //       _sudokuKutu.put('seviye', deger);
-                        //       _sudokuKutu.put('sudokuRows', null);
-
-                        //       Navigator.push(
-                        //         context,
-                        //         MaterialPageRoute(builder: (_) => const Sudoku()),
-                        //       );
-                        //     }
-                        //   },
-                        //   itemBuilder: (context) => <PopupMenuEntry>[
-                        //     PopupMenuItem(
-                        //       value: dil['seviye_secin'],
-                        //       enabled: false,
-                        //       child: Text(
-                        //         dil['seviye_secin'],
-                        //         style: TextStyle(
-                        //           fontWeight: FontWeight.bold,
-                        //           color: Theme.of(context).textTheme.bodyText1?.color,
-                        //         ),
-                        //       ),
-                        //     ),
-                        //     for (String k in sudokuSeviyeleri.keys)
-                        //       PopupMenuItem(
-                        //         value: k,
-                        //         child: Text(k),
-                        //       ),
-                        //   ],
-                        // ),
                       ],
                     ),
                     body: Container(
@@ -200,16 +165,12 @@ class _GirisState extends State<Giris> {
                                               //Text Tipi değişicek
                                               dil['tamamlanan_yok'],
                                               textAlign: TextAlign.center,
-                                              style: GoogleFonts.getFont(
-                                                'Permanent Marker',
-                                                textStyle: TextStyle(
-                                                    fontSize: 24.0,
-                                                    color: themeBox
-                                                                .get('tema') ==
-                                                            'dark'
-                                                        ? girisDarkBaslikColor
-                                                        : girisLightBaslikColor),
-                                              ),
+                                              style: TextStyle(
+                                                  fontSize: 24.0,
+                                                  color: themeBox.get('tema') ==
+                                                          'dark'
+                                                      ? girisDarkBaslikColor
+                                                      : girisLightBaslikColor),
                                             ),
                                           ),
                                         )

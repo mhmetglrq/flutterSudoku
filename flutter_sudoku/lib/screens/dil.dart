@@ -2,7 +2,8 @@ Map dil = {
   "giris_title": "Giris Sayfası",
   "sudoku_title": "Sudoku Sayfası",
   "sonuc_title": "Sonuc Sayfası",
-  "tamamlanan_yok": "Henüz bir sudoku çözmediniz",
+  "tamamlanan_yok":
+      "Henüz bir sudoku çözmediniz. Hemen seviyenize göre bir tane seçin.",
   "seviye_secin": "Seviye Seçimi",
   "seviye1": "Çok Kolay",
   "seviye2": "Kolay",
